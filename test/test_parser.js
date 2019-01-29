@@ -1,4 +1,5 @@
 const expect = require('expect.js');
+const mimemessage = require('../');
 const factory = require('../lib/factory');
 const parse = require('../lib/parse');
 const tools = require('./tools');
@@ -201,33 +202,26 @@ describe('Parse headers', () => {
         });
 
         it('must parse contentType', () => {
-            formatted.forEach((entity, i) => {
-                const contentType = entity.contentType();
-                expect(contentType.type).to.eql('image');
-                expect(contentType.subtype).to.eql('png');
-                expect(contentType.fulltype).to.eql('image/png');
+            const contentType = formatted.contentType();
+            expect(contentType.type).to.eql('image');
+            expect(contentType.subtype).to.eql('png');
+            expect(contentType.fulltype).to.eql('image/png');
 
-                const params = !i ? { name: 'logo.png' } : {};
-                expect(contentType.params).to.eql(params);
-            });
+            expect(contentType.params).to.eql({ name: 'logo.png' });
         });
 
         it('must parse contentDisposition', () => {
 
-            formatted.forEach((entity) => {
-                const contentDisposition = entity.contentDisposition();
-                expect(contentDisposition.fulltype).to.eql('inline; filename="logo.png"');
-                expect(contentDisposition.params).to.eql({
-                    filename: 'logo.png'
-                });
+            const contentDisposition = formatted.contentDisposition();
+            expect(contentDisposition.fulltype).to.eql('inline; filename="logo.png"');
+            expect(contentDisposition.params).to.eql({
+                filename: 'logo.png'
             });
         });
 
         it('must parse contentTransferEncoding', () => {
-            formatted.forEach((entity) => {
-                const contentTransferEncoding = entity.contentTransferEncoding();
-                expect(contentTransferEncoding).to.eql('base64');
-            });
+            const contentTransferEncoding = formatted.contentTransferEncoding();
+            expect(contentTransferEncoding).to.eql('base64');
         });
     });
 

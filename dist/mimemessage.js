@@ -704,9 +704,7 @@ var debug$3 = debug('mimemessage:factory');
 var debugerror$2 = debug('mimemessage:ERROR:factory');
 debugerror$2.log = console.warn.bind(console);
 
-function factory() {
-  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  debug$3('factory() | [data:%o]', data);
+function buildEntity(data) {
   var entity = new Entity_1(); // Add Content-Type.
 
   if (data.contentType) {
@@ -729,6 +727,17 @@ function factory() {
   }
 
   return entity;
+}
+
+function factory() {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  debug$3('factory() | [data:%o]', data);
+
+  if (Array.isArray(data.contentType)) {
+    return data.contentType.map(buildEntity);
+  }
+
+  return buildEntity(data);
 }
 
 var mimemessage = {
