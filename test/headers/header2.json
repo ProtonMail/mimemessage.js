@@ -1,0 +1,12 @@
+{
+  "contentType": [
+    "image/png; name=\"logo.png\"",
+    "image/png"
+  ],
+  "contentTransfer": [
+    "base64",
+    "base64"
+  ],
+  "contentId": "<logo.img>",
+  "contentDisposition": "inline; filename=\"logo.png\""
+}

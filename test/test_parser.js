@@ -1,11 +1,12 @@
 const expect = require('expect.js');
-const mimemessage = require('../');
+const factory = require('../lib/factory');
+const parse = require('../lib/parse');
 const tools = require('./tools');
 
 describe('Parser', () => {
     it('must parse msg1', () => {
         const raw = tools.readFile('msg1');
-        const msg = mimemessage.parse(raw);
+        const msg = parse(raw);
 
         expect(msg).to.be.ok();
         expect(msg.isMultiPart()).not.to.be.ok();
@@ -20,7 +21,7 @@ describe('Parser', () => {
 
     it('must parse multipart msg2', () => {
         const raw = tools.readFile('msg2');
-        const msg = mimemessage.parse(raw);
+        const msg = parse(raw);
 
         expect(msg).to.be.ok();
         expect(msg.isMultiPart()).to.be.ok();
@@ -48,7 +49,7 @@ describe('Parser', () => {
 
     it('must parse recursive multipart msg3', () => {
         const raw = tools.readFile('msg3');
-        const msg = mimemessage.parse(raw);
+        const msg = parse(raw);
         expect(msg).to.be.ok();
 
         expect(msg.contentType().type).to.eql('multipart');
@@ -135,7 +136,7 @@ describe('Parser', () => {
 
     it('must parse multipart msg4', () => {
         const raw = tools.readFile('msg4');
-        const msg = mimemessage.parse(raw);
+        const msg = parse(raw);
 
         expect(msg).to.be.ok();
         expect(msg.isMultiPart()).to.be.ok();
@@ -157,34 +158,78 @@ describe('Parser', () => {
 });
 
 describe('Parse headers', () => {
-    const headers = require('./headers/header1.json');
-    const formatted = mimemessage.factory(headers);
 
-    it('must parse headers', () => {
-        expect(formatted).to.be.ok();
-    });
+    describe('Type as a string', () => {
+        const headers = require('./headers/header1.json');
+        const formatted = factory(headers);
 
-    it('must parse contentType', () => {
-        const contentType = formatted.contentType();
-        expect(contentType.type).to.eql('image');
-        expect(contentType.subtype).to.eql('jpeg');
-        expect(contentType.fulltype).to.eql('image/jpeg');
-        expect(contentType.params).to.eql({
-            name: 'IMG_83201.jpeg'
+        it('must parse headers', () => {
+            expect(formatted).to.be.ok();
+        });
+
+        it('must parse contentType', () => {
+            const contentType = formatted.contentType();
+            expect(contentType.type).to.eql('image');
+            expect(contentType.subtype).to.eql('jpeg');
+            expect(contentType.fulltype).to.eql('image/jpeg');
+            expect(contentType.params).to.eql({
+                name: 'IMG_83201.jpeg'
+            });
+        });
+
+        it('must parse contentDisposition', () => {
+            const contentDisposition = formatted.contentDisposition();
+            expect(contentDisposition.fulltype).to.eql('inline; filename="IMG_83201.jpeg"; size=91134');
+            expect(contentDisposition.params).to.eql({
+                filename: 'IMG_83201.jpeg',
+                size: '91134'
+            });
+        });
+
+        it('must parse contentTransferEncoding', () => {
+            const contentTransferEncoding = formatted.contentTransferEncoding();
+            expect(contentTransferEncoding).to.eql('base64');
         });
     });
 
-    it('must parse contentDisposition', () => {
-        const contentDisposition = formatted.contentDisposition();
-        expect(contentDisposition.fulltype).to.eql('inline; filename="IMG_83201.jpeg"; size=91134');
-        expect(contentDisposition.params).to.eql({
-            filename: 'IMG_83201.jpeg',
-            size: '91134'
+    describe('Type as an Array', () => {
+        const headers = require('./headers/header2.json');
+        const formatted = factory(headers);
+
+        it('must parse headers', () => {
+            expect(formatted).to.be.ok();
+        });
+
+        it('must parse contentType', () => {
+            formatted.forEach((entity, i) => {
+                const contentType = entity.contentType();
+                expect(contentType.type).to.eql('image');
+                expect(contentType.subtype).to.eql('png');
+                expect(contentType.fulltype).to.eql('image/png');
+
+                const params = !i ? { name: 'logo.png' } : {};
+                expect(contentType.params).to.eql(params);
+            });
+        });
+
+        it('must parse contentDisposition', () => {
+
+            formatted.forEach((entity) => {
+                const contentDisposition = entity.contentDisposition();
+                expect(contentDisposition.fulltype).to.eql('inline; filename="logo.png"');
+                expect(contentDisposition.params).to.eql({
+                    filename: 'logo.png'
+                });
+            });
+        });
+
+        it('must parse contentTransferEncoding', () => {
+            formatted.forEach((entity) => {
+                const contentTransferEncoding = entity.contentTransferEncoding();
+                expect(contentTransferEncoding).to.eql('base64');
+            });
         });
     });
 
-    it('must parse contentTransferEncoding', () => {
-        const contentTransferEncoding = formatted.contentTransferEncoding();
-        expect(contentTransferEncoding).to.eql('base64');
-    });
+
 });
