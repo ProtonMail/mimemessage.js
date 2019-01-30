@@ -3,22 +3,22 @@
  */
 const expect = require('expect.js');
 const mimemessage = require('../');
+const factory = require('../lib/factory');
 
 /**
  * Local variables.
  */
-let msg;
 
 
 describe('Message', () => {
 
-    it('must create a MIME message via mimemessage.factory()', () => {
-        msg = mimemessage.factory({
-            contentType: 'Text/Plain',
-            contentTransferEncoding: 'BASE64',
-            body: 'HELLO œæ€!'
-        });
+    let msg = factory({
+        contentType: 'Text/Plain',
+        contentTransferEncoding: 'BASE64',
+        body: 'HELLO œæ€!'
+    });
 
+    it('must create a MIME message via mimemessage.factory()', () => {
         expect(msg.contentType().type).to.be('text');
         expect(msg.contentType().subtype).to.be('plain');
         expect(msg.contentType().fulltype).to.be('text/plain');
@@ -36,14 +36,14 @@ describe('Message', () => {
         expect(msg.isMultiPart()).to.be.ok();
         expect(msg.contentType().type).to.be('multipart');
 
-        const part1 = mimemessage.factory({
+        const part1 = factory({
             body: 'PART1'
         });
 
         msg.body.push(part1);
         expect(msg.body[0].contentType().fulltype).to.be('text/plain');
 
-        const part2 = mimemessage.factory({
+        const part2 = factory({
             contentType: 'multipart/alternative',
             body: []
         });
@@ -51,10 +51,10 @@ describe('Message', () => {
         msg.body.push(part2);
         expect(msg.body[1].contentType().fulltype).to.be('multipart/alternative');
 
-        part2.body.push(mimemessage.factory({
+        part2.body.push(factory({
             body: 'SUBPART1'
         }));
-        part2.body.push(mimemessage.factory({
+        part2.body.push(factory({
             body: 'SUBPART2'
         }));
     });
@@ -62,7 +62,7 @@ describe('Message', () => {
     it('must parse header custom with ;', () => {
         const contentType = 'image/png; filename="Fleshing out a sketch of a bird for a friend! - ;.png"; name="Fleshing out a sketch of a bird for a friend! - ;.png"';
         const name = 'Fleshing out a sketch of a bird for a friend! - ;.png';
-        const msg = mimemessage.factory({
+        const msg = factory({
             contentType
         });
         expect(msg.contentType().params).to.eql({
@@ -74,7 +74,7 @@ describe('Message', () => {
     it('must parse header with unicode', () => {
         const name = '🗳🧙️📩❤️💡😒🗳🗃😍💡😂.png';
         const contentType = `image/png; filename="${name}"; name="${name}"`;
-        const msg = mimemessage.factory({
+        const msg = factory({
             contentType
         });
 
@@ -83,7 +83,7 @@ describe('Message', () => {
     });
 
     it('must encode content', () => {
-        const entity = mimemessage.factory({
+        const entity = factory({
             contentType: 'text/plain; filename=tada; name=tada',
             contentTransferEncoding: 'base64',
             body: '0'.repeat(200)
@@ -97,7 +97,7 @@ MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
 MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
 MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=`.replace(/\n/g, '\r\n'));
 
-        const entityunicode = mimemessage.factory({
+        const entityunicode = factory({
             contentType: 'text/plain; filename=売伝済屯講天表禁衣佐後山; name=正見打実労叫投樫媛由峰図読時要位; charset=utf-8',
             contentTransferEncoding: 'quoted-printable',
             body: '🗳🧙️📩❤️💡😒正見打実労叫投樫媛由峰図読時要位🗳😍💡😂'.repeat(200)
@@ -110,7 +110,7 @@ MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=`.replace(/\n/g, '\r\n'));
     });
 
     it('must encode utf8 content', () => {
-        const entity = mimemessage.factory({
+        const entity = factory({
             contentType: 'text/plain; filename=tada; name=tada; charset=utf-8',
             contentTransferEncoding: 'quoted-printable',
             body: 'ó'.repeat(200)

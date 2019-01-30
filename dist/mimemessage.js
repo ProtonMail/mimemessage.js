@@ -740,6 +740,7 @@ var formatKey = function formatKey(key) {
 function factory() {
   var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   debug$3('factory() | [data:%o]', data);
+  var stringifyKey = ['contentType', 'contentDisposition', 'contentTransferEncoding'];
   /*
       Some keys can be an array, as headers are strings we parse them
       then we keep only the longest string.
@@ -756,7 +757,7 @@ function factory() {
   var config = Object.keys(data).reduce(function (acc, item) {
     var key = formatKey(item);
 
-    if (Array.isArray(data[item])) {
+    if (stringifyKey.includes(key) && Array.isArray(data[item])) {
       acc[key] = data[item].reduce(function (acc, key) {
         return acc.length > key.length ? acc : key;
       }, '');
