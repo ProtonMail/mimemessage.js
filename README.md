@@ -139,6 +139,17 @@ fVkVvYassFAAAABQAAAAIAAAAbWltZXR5cG==
 
 You can read the full [API documentation](docs/index.md) in the *docs* folder.
 
+## Tests
+
+Run once,
+```sh
+$ npm test
+```
+
+Watch mode:
+```sh
+$ npm run test -- -w
+```
 
 ### Debugging
 
@@ -152,11 +163,17 @@ process.env.DEBUG = 'mimemessage*';
 
 In the browser run `mimemessage.debug.enable('mimemessage*');` and reload the page. Note that the debugging settings are stored into the browser LocalStorage. To disable it run `mimemessage.debug.disable('mimemessage*');`.
 
+You can also set the envia the console, ex:
+```sh
+DEBUG=mimemessage:* npm run test -- -w
+```
+
 
 ## Author
 
 Iñaki Baz Castillo
 Kay Lukas
+ProtonMail team
 
 
 ## License
