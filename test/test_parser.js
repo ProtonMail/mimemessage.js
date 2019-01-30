@@ -193,7 +193,7 @@ describe('Parse headers', () => {
         });
     });
 
-    describe('Type as an Array', () => {
+    describe('Type headers array + non standard', () => {
         const headers = require('./headers/header2.json');
         const formatted = factory(headers);
 

@@ -729,15 +729,44 @@ function buildEntity(data) {
   return entity;
 }
 
+var formatKey = function formatKey(key) {
+  if (key === 'contentTransfer') {
+    return 'contentTransferEncoding';
+  }
+
+  return key;
+};
+
 function factory() {
   var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   debug$3('factory() | [data:%o]', data);
+  /*
+      Some keys can be an array, as headers are strings we parse them
+      then we keep only the longest string.
+      ex:
+          "contentType": [
+            "image/png; name=\"logo.png\"",
+            "image/png"
+          ],
+      Output:
+          "contentType": "image/png; name=\"logo.png\""
+       Some key are also non-standard ex: contentTransfer instead of contentTransferEncoding, we format the key too.
+   */
 
-  if (Array.isArray(data.contentType)) {
-    return data.contentType.map(buildEntity);
-  }
+  var config = Object.keys(data).reduce(function (acc, item) {
+    var key = formatKey(item);
 
-  return buildEntity(data);
+    if (Array.isArray(data[item])) {
+      acc[key] = data[item].reduce(function (acc, key) {
+        return acc.length > key.length ? acc : key;
+      }, '');
+      return acc;
+    }
+
+    acc[key] = data[key];
+    return acc;
+  }, Object.create(null));
+  return buildEntity(config);
 }
 
 var mimemessage = {
