@@ -758,9 +758,8 @@ function factory() {
     var key = formatKey(item);
 
     if (stringifyKey.includes(key) && Array.isArray(data[item])) {
-      acc[key] = data[item].reduce(function (acc, key) {
-        return acc.length > key.length ? acc : key;
-      }, '');
+      acc[key] = data[item][0]; // BE convention is to do the first one
+
       return acc;
     }
 
