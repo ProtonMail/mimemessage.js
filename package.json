@@ -1,5 +1,5 @@
 {
-  "name": "mimemessage",
+  "name": "@protontech/mimemessage",
   "version": "1.1.4",
   "description": "MIME messages for JavaScript (RFC 2045 & 2046)",
   "author": "Iñaki Baz Castillo",
