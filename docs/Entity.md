@@ -107,7 +107,12 @@ If `value` is `null` the header is removed.
 ```javascript
 entity.header('Content-ID', '<1234@foo.com>');
 ```
-
+ 
+Emails can be sent to multiple recipients: 
+```javascript
+const emails = ['foo@example.com', 'bar@example.com'];
+entity.header('To', emails.join(','));
+```
 
 ### `entity.toString(options)`
 
